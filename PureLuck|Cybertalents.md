@@ -1,14 +1,14 @@
 ## [Pure luck](https://cybertalents.com/challenges/malware/pure-luck)
 
 It’s an ELF 32-bit.
-```
+```console
 m49di@DESKTOP-QB5N34E:~/CTF$ file pure-luck.out
 pure-luck.out: ELF 32-bit LSB executable, Intel 80386, version 1 (GNU/Linux), statically linked, 
 for GNU/Linux 2.6.32,BuildID[sha1]=939303fa92c4eb795fb6bf4e0941a81ba2b46436, not stripped
 ```
 So first I tried to run strings command and grep for the flag but I didn't find any luck, but I found some text that gave
 a hint that this file could be UPX packed.
-```
+```console
 m49di@DESKTOP-QB5N34E:~$ strings pure-luck.out | cat -n | grep -i upx
      1  UPX!,
   4469  $Info: This file is packed with the UPX executable packer http://upx.sf.net $
@@ -18,7 +18,7 @@ m49di@DESKTOP-QB5N34E:~$ strings pure-luck.out | cat -n | grep -i upx
   4975  UPX!
 ```
 So I unpacked it with the UPX unpacker and tried to run strings again but didn’t find the flag.
-```
+```console
 m49di@DESKTOP-QB5N34E:~$ upx -d pure-luck.out
                        Ultimate Packer for eXecutables
                           Copyright (C) 1996 - 2018
@@ -32,7 +32,7 @@ Unpacked 1 file.
 ```
 Then I went to ghidra to look at the assembly code and found something interesting .. that there are some values 
 are being pushed to the stack and they aren't used.
-```
+```assembly
         080488f7 c6 45 dc 66     MOV        byte ptr [EBP + -0x24], 0x66
         080488fb c6 45 dd 6c     MOV        byte ptr [EBP + -0x23], 0x6c
         080488ff c6 45 de 61     MOV        byte ptr [EBP + -0x22], 0x61
@@ -59,7 +59,7 @@ are being pushed to the stack and they aren't used.
         08048953 c6 45 f3 7d     MOV        byte ptr [EBP + -0xd], 0x7d
 ```
 Then I converted them to a characters using bash
-```
+```console
 m49di@DESKTOP-QB5N34E:~$ echo "        080488f7 c6 45 dc 66     MOV        byte ptr [EBP + -0x24], 0x66
         080488fb c6 45 dd 6c     MOV        byte ptr [EBP + -0x23], 0x6c
         080488ff c6 45 de 61     MOV        byte ptr [EBP + -0x22], 0x61
